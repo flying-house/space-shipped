@@ -1,0 +1,13 @@
+{
+    "basicShip": {
+        "name": "Basic Ship",
+        "engine": "basicEngine",
+        "mass": 2200,
+        "length": 12,
+        "maxFuel": 750,
+        "turnRate": 80,
+        "turnCost": 0.45,
+        "revThrust": 42,
+        "revCost": 2.9
+    }
+}
