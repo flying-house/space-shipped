@@ -25,7 +25,13 @@ def main():
         thrustR = keys[pygame.K_s] 
         rotateL = keys[pygame.K_a]
         rotateR = keys[pygame.K_d]
-        ship.update(dt, thrustF, thrustR, rotateL, rotateR)
+        slewL = keys[pygame.K_q]
+        slewR = keys[pygame.K_e]
+        ship.update(dt, thrustF, thrustR, rotateL, rotateR, slewL, slewR)
+
+        if keys[pygame.K_p]:
+            if ship.fuel < ship.maxFuel:
+                ship.fuel = ship.maxFuel
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

@@ -2,8 +2,8 @@
     "basicEngine": {
         "name": "Basic Engine",
         "thrust": 200,
-        "fuelBurn": 11.9,
-        "mass": 195,
-        "steerScalar": 1.4
+        "fuelBurn": 9.89,
+        "mass": 235,
+        "vectoring": 2.71
     }
 }

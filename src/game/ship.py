@@ -7,9 +7,12 @@ class Ship:
     def __init__(self, x, y):
         with open("src/data/ships.json") as s:
             cfgShip = json.load(s)["basicShip"]
+
         self.name = cfgShip["name"]
         self.engine = cfgShip["engine"]
-
+        # can't use following open statement until engine name is fetched
+        # unsure how to do this when eventually selecting ship & engine
+        # from stored/saved gamestate data instead of hardcoded value
         with open("src/data/engines.json") as e:
             cfgEng = json.load(e)[self.engine]
 
@@ -22,11 +25,13 @@ class Ship:
         self.engBurn = False
         self.revBurn = False
         self.engCost = cfgEng["fuelBurn"]
+        self.engVectoring = cfgEng["vectoring"]
         self.length = cfgShip["length"]
-        self.fuel = cfgShip["maxFuel"] // 2
+        self.fuel = cfgShip["maxFuel"] // 8
         self.maxFuel = cfgShip["maxFuel"]
         self.massEmpty = cfgShip["mass"] + cfgEng["mass"]
-        self.mass = self.massEmpty + self.fuel
+        self.cargo = 0 # placeholder
+        self.mass = self.massEmpty + self.fuel + self.cargo
 
         # turnRate in deg/s
         # TODO: MOI-based rate calc, ?angular momentum
@@ -35,35 +40,62 @@ class Ship:
         self.revThrust = cfgShip["revThrust"]
         self.revCost = cfgShip["revCost"]
 
-    def update(self, dt, thrustFwd, thrustRev, rotateL, rotateR):
+    def update(self, dt, thrustFwd, thrustRev, rotateL, rotateR, slewL, slewR):
         self.engBurn = thrustFwd
         self.revBurn = thrustRev
+        self.slewL = slewL
+        self.slewR = slewR
 
-        if rotateL:
-            self.angularVelocity = -self.turnRate
-            turnFuel = dt * self.turnCost
-        elif rotateR:
-            self.angularVelocity = self.turnRate
-            turnFuel = dt * self.turnCost
-        else:
-            self.angularVelocity = 0
-            turnFuel = 0
-
-        burnFuel = 0
+        burnFuel, turnFuel, slewFuel = 0, 0, 0
         thrustVector = pygame.Vector2(0, 0)
+        slewVector = pygame.Vector2(0, 0)
 
-        if self.engBurn:
-            thrustVector = pygame.Vector2(0, -self.thrust)
-            burnFuel += dt * self.engCost
-        if self.revBurn:
-            thrustVector = pygame.Vector2(0, self.thrust)
-            burnFuel += dt * self.revCost
+        if self.fuel > 0:
+            if self.engBurn:
+                thrustVector = pygame.Vector2(0, -self.thrust)
+                burnFuel += dt * self.engCost
+            if self.revBurn:
+                thrustVector = pygame.Vector2(0, self.revThrust)
+                burnFuel += dt * self.revCost
+
+            if self.slewL:
+                slewVector = pygame.Vector2(-self.revThrust // 2, 0)
+                slewFuel += dt * self.revCost // 3
+            elif self.slewR:
+                slewVector = pygame.Vector2(self.revThrust // 2, 0)
+                slewFuel += dt * self.revCost // 3
+            else:
+                self.slewVector = pygame.Vector2(0, 0)
+
+            if rotateL and not thrustFwd:
+                self.angularVelocity = -self.turnRate
+                turnFuel = dt * self.turnCost
+            elif rotateL and thrustFwd:
+                # multiply steering by engine vectoring scalar
+                thrustVectoredRate = self.turnRate * self.engVectoring
+                self.angularVelocity = -thrustVectoredRate
+                turnFuel = dt * self.turnCost
+            elif rotateR and not thrustFwd:
+                self.angularVelocity = self.turnRate
+                turnFuel = dt * self.turnCost
+            elif rotateR and thrustFwd:
+                # multiply steering by engine vectoring scalar
+                thrustVectoredRate = self.turnRate * self.engVectoring
+                self.angularVelocity = thrustVectoredRate
+                turnFuel = dt * self.turnCost
+            else:
+                self.angularVelocity = 0
+        else:
+            self.fuel = 0
 
         thrustVector.rotate_ip(self.hdg)
+        slewVector.rotate_ip(self.hdg)
         self.velocity += (thrustVector * dt / self.mass) * 1000
+        self.velocity += (slewVector * dt / self.mass) * 1000
         self.pos += dt * self.velocity
         self.hdg += dt * self.angularVelocity
-        self.fuel -= (burnFuel + turnFuel)
+        self.fuel -= (burnFuel + turnFuel + slewFuel)
+        self.mass = self.massEmpty + self.fuel + self.cargo
         
     def draw(self, screen):
         shipPoints = [

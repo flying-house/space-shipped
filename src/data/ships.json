@@ -2,7 +2,7 @@
     "basicShip": {
         "name": "Basic Ship",
         "engine": "basicEngine",
-        "mass": 2200,
+        "mass": 5200,
         "length": 12,
         "maxFuel": 750,
         "turnRate": 80,

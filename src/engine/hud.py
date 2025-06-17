@@ -14,7 +14,8 @@ class HUD:
             f"Pos: ({int(ship.pos.x)}, {int(ship.pos.y)})",
             f"Speed: {speed:.1f} m/s",
             f"Heading: {heading}°", 
-            f"Fuel: {int(ship.fuel)}/{int(ship.maxFuel)}",
+            f"Fuel: {int(ship.fuel)}/{int(ship.maxFuel)}kg",
+            f"Mass: {int(ship.mass)}kg",
             f"Money: ${money}",
         ]
         hudHeight = len(hudLines) * 25 + 10
