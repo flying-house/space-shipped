@@ -20,6 +20,9 @@ def main():
     while running:
         dt = clock.get_time() / 1000.0 # seconds
 
+        # I realize I need to create an input handler separate from main here
+        # and just need to figure out how best to do it. Passing all commands
+        # in via update() is a bit silly, I know, but for now it works to test
         keys = pygame.key.get_pressed()
         thrustF = keys[pygame.K_w]
         thrustR = keys[pygame.K_s] 
@@ -29,7 +32,8 @@ def main():
         slewR = keys[pygame.K_e]
         ship.update(dt, thrustF, thrustR, rotateL, rotateR, slewL, slewR)
 
-        if keys[pygame.K_p]:
+        # sneaky refuel command for testing
+        if keys[pygame.K_p]:    
             if ship.fuel < ship.maxFuel:
                 ship.fuel = ship.maxFuel
 
@@ -37,7 +41,7 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
 
-        screen.fill((10, 10, 20))
+        screen.fill((5, 10, 50))
         ship.draw(screen)
         hud.draw(screen, ship, playerMoney)
         pygame.display.flip()

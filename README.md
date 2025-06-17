@@ -19,7 +19,6 @@ Space Shipped is a 2D space simulation game where players take on the role of pi
 *Goals are in priority order*
 
 ### Immediate Goals (in priority order):
-- Slew thrust (`Q`/`E`) & related fuel consumption
 - Procedural background layers in parallax
     - **Very** slow-moving distant star layer
     - Nearer layers of dim, non-colliding asteroids
@@ -30,7 +29,7 @@ Space Shipped is a 2D space simulation game where players take on the role of pi
 - Economic gameplay (basic A->B reward system)
 - Saved game state
 - General tuning:
-    - Thrust/mass balancing
+    - Thrust/mass balancing (may need fuel as higher proportion, so higher burn rates)
     - Fuel consumption
     - Distances/playability
 
@@ -84,6 +83,7 @@ Depends on Python 3.11+ and pip
 | `D` | Rotate right |
 | `Q` | Slew left |
 | `E` | Slew right |
+| `P` | Refuel to max (for testing, to be removed) |
 
 
 ## Misc
